@@ -522,8 +522,8 @@ function datosIniciales() {
     { id: 'p4', cat: 'c1', nombre: '1/2 kg', precio: 11500, gramos: 500, sabores: 4, orden: 5 },
     { id: 'p5', cat: 'c1', nombre: '1 kg', precio: 20500, gramos: 1000, sabores: 5, orden: 6 },
     { id: 'p6', cat: 'c2', nombre: 'Café', precio: 3500, gramos: 0, sabores: 0, orden: 1, emoji: '☕' },
-    { id: 'p7', cat: 'c3', nombre: 'Milkshake', precio: 6500, gramos: 150, sabores: 1, orden: 1,
-      saboresPropios: ['Dulce de leche', 'Chocolate', 'Frutilla', 'Oreo'] }
+    /* Sin lista propia: elige del pozo real y descuenta los gramos del balde */
+    { id: 'p7', cat: 'c3', nombre: 'Milkshake', precio: 6500, gramos: 150, sabores: 1, orden: 1, emoji: '🥤' }
   ];
   const recetas = [
     { prod: 'p1', ins: 'i17', cant: 1 },
@@ -598,7 +598,9 @@ function datosIniciales() {
     sabores: SABORES_BASE.map((s, i) => ({
       id: 'sb' + (i + 1), nombre: s[0], color: s[1], activo: true,
       orden: i + 1, agotado: false, forzarDisponible: false,
-      stock: 6000, minimo: 1500
+      stock: 6000,
+      /* Crema Oreo se consume al doble por los milkshakes: avisa medio balde antes */
+      minimo: s[0] === 'Crema Oreo' ? 3000 : 1500
     })),
     insumos: insumos,
     recetas: recetas,
