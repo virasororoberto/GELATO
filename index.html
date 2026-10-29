@@ -494,6 +494,7 @@ function datosIniciales() {
     { id: 'c3', nombre: 'Milkshakes', emoji: '🥤', orden: 3, activa: true },
     { id: 'c7', nombre: 'Promos', emoji: '🎉', orden: 4, activa: true },
     { id: 'c8', nombre: 'Pochoclos', emoji: '🍿', orden: 5, activa: true },
+    { id: 'c9', nombre: 'Palitos', emoji: '🍫', orden: 6, activa: true },
     { id: 'c4', nombre: 'Chipá y panificados', emoji: '🥐', orden: 4, activa: false },
     { id: 'c5', nombre: 'Postres', emoji: '🍰', orden: 5, activa: false },
     { id: 'c6', nombre: 'Bebidas', emoji: '🧃', orden: 6, activa: false }
@@ -521,6 +522,9 @@ function datosIniciales() {
     { id: 'i22', nombre: 'Caja pochoclo grande', unidad: 'unidad', costo: 350, stock: 0, minimo: 60 },
     { id: 'i23', nombre: 'Balde pochoclo', unidad: 'unidad', costo: 1000, stock: 0, minimo: 40 },
     { id: 'i24', nombre: 'Aceite y caramelo', unidad: 'g', costo: 2.5, stock: 0, minimo: 1000 },
+    /* Palitos: se compran hechos, así que el costo es el palito entero */
+    { id: 'i25', nombre: 'Palito bombón', unidad: 'unidad', costo: 850, stock: 40, minimo: 12 },
+    { id: 'i26', nombre: 'Paleta frutal', unidad: 'unidad', costo: 650, stock: 40, minimo: 12 },
     { id: 'i13', nombre: 'Vaso milkshake', unidad: 'unidad', costo: null, stock: 0, minimo: 60 },
     { id: 'i14', nombre: 'Oreo', unidad: 'unidad', costo: null, stock: 0, minimo: 24 }
   ];
@@ -534,6 +538,8 @@ function datosIniciales() {
     { id: 'p10', cat: 'c8', nombre: 'Pochoclo chico', precio: 3000, gramos: 0, sabores: 0, orden: 1, emoji: '🍿' },
     { id: 'p11', cat: 'c8', nombre: 'Pochoclo grande', precio: 5000, gramos: 0, sabores: 0, orden: 2, emoji: '🍿' },
     { id: 'p12', cat: 'c8', nombre: 'Balde de pochoclo', precio: 9000, gramos: 0, sabores: 0, orden: 3, emoji: '🍿' },
+    { id: 'p13', cat: 'c9', nombre: 'Palito bombón', precio: 2000, gramos: 0, sabores: 0, orden: 1, emoji: '🍫' },
+    { id: 'p14', cat: 'c9', nombre: 'Paleta frutal', precio: 1500, gramos: 0, sabores: 0, orden: 2, emoji: '🍓' },
     { id: 'p4', cat: 'c1', nombre: '1/2 kg', precio: 11500, gramos: 500, sabores: 4, orden: 5 },
     { id: 'p5', cat: 'c1', nombre: '1 kg', precio: 20500, gramos: 1000, sabores: 5, orden: 6 },
     { id: 'p6', cat: 'c2', nombre: 'Café', precio: 3500, gramos: 0, sabores: 0, orden: 1, emoji: '☕' },
@@ -549,6 +555,8 @@ function datosIniciales() {
     { prod: 'p10', ins: 'i20', cant: 45 }, { prod: 'p10', ins: 'i21', cant: 1 }, { prod: 'p10', ins: 'i24', cant: 40 },
     { prod: 'p11', ins: 'i20', cant: 75 }, { prod: 'p11', ins: 'i22', cant: 1 }, { prod: 'p11', ins: 'i24', cant: 60 },
     { prod: 'p12', ins: 'i20', cant: 110 }, { prod: 'p12', ins: 'i23', cant: 1 }, { prod: 'p12', ins: 'i24', cant: 80 },
+    { prod: 'p13', ins: 'i25', cant: 1 },
+    { prod: 'p14', ins: 'i26', cant: 1 },
     { prod: 'p4', ins: 'i4', cant: 1 }, { prod: 'p4', ins: 'i2', cant: 3 },
     { prod: 'p5', ins: 'i5', cant: 1 }, { prod: 'p5', ins: 'i2', cant: 4 },
     { prod: 'p6', ins: 'i10', cant: 9 }, { prod: 'p6', ins: 'i11', cant: 60 },
@@ -752,6 +760,20 @@ function migrar() {
       { prod: 'p10', ins: 'i20', cant: 45 }, { prod: 'p10', ins: 'i21', cant: 1 }, { prod: 'p10', ins: 'i24', cant: 40 },
       { prod: 'p11', ins: 'i20', cant: 75 }, { prod: 'p11', ins: 'i22', cant: 1 }, { prod: 'p11', ins: 'i24', cant: 60 },
       { prod: 'p12', ins: 'i20', cant: 110 }, { prod: 'p12', ins: 'i23', cant: 1 }, { prod: 'p12', ins: 'i24', cant: 80 });
+    cambio = true;
+  }
+  /* Palitos bombón y paletas frutales: se compran hechos y se revenden */
+  if (!DB.productos.some(p => p.id === 'p13')) {
+    if (!DB.categorias.some(x => x.id === 'c9')) {
+      DB.categorias.push({ id: 'c9', nombre: 'Palitos', emoji: '🍫', orden: 6, activa: true });
+    }
+    [{ id: 'i25', nombre: 'Palito bombón', unidad: 'unidad', costo: 850, stock: 40, minimo: 12 },
+     { id: 'i26', nombre: 'Paleta frutal', unidad: 'unidad', costo: 650, stock: 40, minimo: 12 }]
+      .forEach(i => { if (!DB.insumos.some(x => x.id === i.id)) DB.insumos.push(i); });
+    DB.productos.push(
+      { id: 'p13', cat: 'c9', nombre: 'Palito bombón', precio: 2000, gramos: 0, sabores: 0, orden: 1, emoji: '🍫' },
+      { id: 'p14', cat: 'c9', nombre: 'Paleta frutal', precio: 1500, gramos: 0, sabores: 0, orden: 2, emoji: '🍓' });
+    DB.recetas.push({ prod: 'p13', ins: 'i25', cant: 1 }, { prod: 'p14', ins: 'i26', cant: 1 });
     cambio = true;
   }
   /* El gusto que se lleva los milkshakes necesita avisar antes */
